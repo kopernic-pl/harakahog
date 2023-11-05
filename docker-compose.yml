@@ -3,6 +3,7 @@ version: '3'
 services:
   mailhog:
     image: mailhog/mailhog:v1.0.1
+    restart: unless-stopped
     ports:
       - "8025:8025"
       - "1025:1025"
@@ -11,11 +12,11 @@ services:
 # haraka image with smtp relay to mailhog
   haraka:
     image: instrumentisto/haraka:3.0.2
+    restart: unless-stopped
     ports:
       - "587:587"
-      - "25:25"
     volumes:
-        - ./h-config:/etc/haraka/config:r0
+        - ./h-config:/etc/haraka/config
 
     environment:
       - HARAKA_LOG_LEVEL=info

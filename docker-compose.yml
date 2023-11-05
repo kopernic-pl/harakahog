@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mailhog:
-    image: mailhog/mailhog
+    image: mailhog/mailhog:v1.0.1
     ports:
       - "8025:8025"
       - "1025:1025"
@@ -10,7 +10,7 @@ services:
 
 # haraka image with smtp relay to mailhog
   haraka:
-    image: instrumentisto/haraka
+    image: instrumentisto/haraka:3.0.2
     ports:
       - "587:587"
       - "25:25"

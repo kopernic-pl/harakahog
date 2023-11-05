@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+
+# haraka image with smtp relay to mailhog
+  haraka:
+    image: instrumentisto/haraka
+    ports:
+      - "587:587"
+      - "25:25"
+    volumes:
+        - ./h-config:/etc/haraka/config:r0
+
+    environment:
+      - HARAKA_LOG_LEVEL=info
+      - APK_INSTALL_PACKAGES=openssl

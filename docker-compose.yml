@@ -11,7 +11,7 @@ services:
 
 # haraka image with smtp relay to mailhog
   haraka:
-    image: instrumentisto/haraka:3.0.3
+    image: instrumentisto/haraka:3.1.1
     restart: unless-stopped
     ports:
       - "587:587"

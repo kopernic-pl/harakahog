@@ -7,7 +7,7 @@ haraka:
     # -- Haraka Docker image repository
     repository: instrumentisto/haraka
     # -- Haraka Docker image tag
-    tag: "3.1.2"
+    tag: "3.0.3"
     # -- Haraka image pull policy
     pullPolicy: IfNotPresent
   service:

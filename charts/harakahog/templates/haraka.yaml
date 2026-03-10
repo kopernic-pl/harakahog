@@ -58,6 +58,25 @@ spec:
       labels:
         {{- include "harakahog.haraka.labels" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: init-config
+          image: "busybox:1.36"
+          command:
+            - sh
+            - -c
+            - |
+              cp /configmap/* /config/
+              mkdir -p /config/tls
+              cp /tls-secret/* /config/tls/
+          volumeMounts:
+            - name: haraka-configmap
+              mountPath: /configmap
+              readOnly: true
+            - name: tls-secret
+              mountPath: /tls-secret
+              readOnly: true
+            - name: haraka-config
+              mountPath: /config
       containers:
         - name: haraka
           image: "{{ .Values.haraka.image.repository }}:{{ .Values.haraka.image.tag }}"
@@ -74,16 +93,15 @@ spec:
           volumeMounts:
             - name: haraka-config
               mountPath: /etc/haraka/config
-            - name: tls
-              mountPath: /etc/haraka/config/tls
-              readOnly: true
       volumes:
-        - name: haraka-config
+        - name: haraka-configmap
           configMap:
             name: {{ printf "%s-config" (include "harakahog.haraka.fullname" .) }}
-        - name: tls
+        - name: tls-secret
           secret:
             secretName: {{ default (printf "%s-tls" (include "harakahog.haraka.fullname" .)) .Values.haraka.config.tls.secretName }}
+        - name: haraka-config
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

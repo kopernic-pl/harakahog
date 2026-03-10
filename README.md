@@ -55,7 +55,7 @@ brew install swaks
 
 And then let's send some test email
 ```sh
-swaks --from asd@xyz.co --to x@asdffdsa.com --server localhost:587 -tls -a LOGIN
+swaks --from admin@example.org --to test@abc.com --server localhost:587 -tls -a LOGIN
 ```
 
 `-tls` option forces STARTTLS communucation. `-a LOGIN` forces LOGIN SMTP auth.
@@ -102,7 +102,7 @@ helm install harakahog oci://ghcr.io/kopernic-pl/charts/harakahog \
 
 By default, services are accessible within the cluster. Mailhog web UI at http://localhost:8025,
 Haraka SMTP at http://localhost:5870.
-Default SMTP credentials are `admin`/`admin123`.
+Default SMTP credentials are `admin@example.org`/`admin123`.
 Default whitelisted IPs for relay are: [`127.0.0.1/32`, `192.168.65.1/32`].
 
 ### Test 
@@ -110,7 +110,7 @@ Default whitelisted IPs for relay are: [`127.0.0.1/32`, `192.168.65.1/32`].
 You can verify if chart works by sending a dummy email using `swaks`:
 
 ```sh
-swaks --from sender@example.org --to reciever@example.org --server localhost:5870 -tls -a LOGIN
+swaks --from admin@example.org --to test@abc.com --server localhost:5870 -tls -a LOGIN
 ```
 
 ### Customization

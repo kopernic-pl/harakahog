@@ -70,7 +70,7 @@ Relay ACL allow list.
 Auth flat file users section.
 */}}
 {{- define "harakahog.haraka.authUsers" -}}
-{{- range $user, $pass := .Values.haraka.config.auth.users }}
-{{ $user }}={{ $pass }}
+{{- range $email, $pass := .Values.haraka.config.auth.users }}
+{{ $email }}={{ $pass }}
 {{- end }}
 {{- end }}

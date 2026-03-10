@@ -24,9 +24,9 @@ haraka:
       # (Defaults to `harakahog-tls` if left empty).
       secretName: ""
     auth:
-      # -- Map of SMTP AUTH users (username: password)
+      # -- Map of SMTP AUTH users (email: password)
       users:
-        admin: admin123
+        admin@example.org: admin123
       # -- List of IP addresses/ranges (CIDR) allowed to relay without authentication
       relayAcl:
         - "127.0.0.1/32"

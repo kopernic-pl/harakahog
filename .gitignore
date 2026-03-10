@@ -20,20 +20,10 @@
 h-config/dhparams.pem
 h-config/me
 
-# Local Settings and Secrets
-h-config/auth_flat_file.ini
-h-config/relay_acl_allow
-
 # Runtime and Log Files
 h-config/log.ini
 *.log
 logs/
-
-# Node.js
-node_modules/
-npm-debug.log
-package-lock.json
-yarn.lock
 
 # Docker
 .docker/

@@ -1,0 +1,50 @@
+# -- Number of pod replicas for all deployments
+replicaCount: 1
+
+# -- Haraka configuration
+haraka:
+  image:
+    # -- Haraka Docker image repository
+    repository: instrumentisto/haraka
+    # -- Haraka Docker image tag
+    tag: "3.1.2"
+    # -- Haraka image pull policy
+    pullPolicy: IfNotPresent
+  service:
+    # -- Haraka Kubernetes service type
+    type: ClusterIP
+    # -- Haraka SMTP service port
+    port: 5870
+  config:
+    # -- Haraka log level<br>
+    # Must be one of: [data, protocol, debug, info, notice, warn, error, crit, alert, emerg]
+    logLevel: info
+    tls:
+      # -- Name of the Kubernetes secret containing `tls_key.pem` and `tls_cert.pem`
+      # (Defaults to `harakahog-tls` if left empty).
+      secretName: ""
+    auth:
+      # -- Map of SMTP AUTH users (username: password)
+      users:
+        admin: admin123
+      # -- List of IP addresses/ranges (CIDR) allowed to relay without authentication
+      relayAcl:
+        - "127.0.0.1/32"
+        - "192.168.65.1/32"
+
+# -- MailHog configuration
+mailhog:
+  image:
+    # -- MailHog Docker image repository
+    repository: mailhog/mailhog
+    # -- MailHog Docker image tag
+    tag: "v1.0.1"
+    # -- MailHog image pull policy
+    pullPolicy: IfNotPresent
+  service:
+    # -- MailHog Kubernetes service type
+    type: ClusterIP
+    # -- MailHog SMTP port
+    smtpPort: 1025
+    # -- MailHog web UI port
+    httpPort: 8025

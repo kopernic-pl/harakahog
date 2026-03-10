@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "harakahog.mailhog.fullname" . }}
+  labels:
+    {{- include "harakahog.labels" . | nindent 4 }}
+    {{- include "harakahog.mailhog.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "harakahog.mailhog.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "harakahog.mailhog.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: mailhog
+          image: "{{ .Values.mailhog.image.repository }}:{{ .Values.mailhog.image.tag }}"
+          imagePullPolicy: {{ .Values.mailhog.image.pullPolicy }}
+          ports:
+            - name: smtp
+              containerPort: 1025
+              protocol: TCP
+            - name: http
+              containerPort: 8025
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "harakahog.mailhog.fullname" . }}
+  labels:
+    {{- include "harakahog.labels" . | nindent 4 }}
+    {{- include "harakahog.mailhog.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.mailhog.service.type }}
+  ports:
+    - port: {{ .Values.mailhog.service.smtpPort }}
+      targetPort: smtp
+      protocol: TCP
+      name: smtp
+    - port: {{ .Values.mailhog.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "harakahog.mailhog.labels" . | nindent 4 }}
+

@@ -1,5 +1,5 @@
 # harakahog
-Mailhog behind Haraka for STARTTLS
+MailHog behind Haraka for STARTTLS
 
 ## Problem statement
 For QA purposes there is a need for a mailcatcher service that supports TLS. [MailHog](https://github.com/mailhog/MailHog) doesn't.
@@ -10,9 +10,11 @@ Specifically, we will configure Haraka to:
 - utilize TLS encryption
 - only accept inbound relay connections from a pre-approved whitelist of IP addresses
 - use SMTP LOGIN auth solely over TLS
-- forward all received emails to the companion MailHog container within the same Docker Compose environment.
+- forward all received emails to the companion MailHog container.
 
-For this proof-of-concept, we will be using Docker Compose, although a Helm chart would also be a viable option.
+## Prerequisites
+
+## Docker installation
 
 ### To configure
 I'm proposing an approach that combines two types of relay authorization: IP ACL and SMTP user LOGIN type authZ.
@@ -23,7 +25,7 @@ Also, system will need some key and certificate.
 
 Run 
 
-```bash
+```sh
 openssl req -newkey rsa:2048 -nodes -keyform PEM -keyout tls_key.pem -outform PEM -x509 -days 365 -out tls_cert.pem
 ```
 and answer certificate questions. Make sure that generated files are in `h-config` dir and `h-config\tls.ini` file is pointing at them.
@@ -47,12 +49,12 @@ When run, there will be some files created in `h-config`, most notably `dhparams
 ### To test
 SMTP over telnet is not *that* complicated but let's use `swaks` (https://github.com/jetmore/swaks) on MacOS.
 
-```bash
+```sh
 brew install swaks
 ```
 
 And then let's send some test email
-```bash
+```sh
 swaks --from asd@xyz.co --to x@asdffdsa.com --server localhost:587 -tls -a LOGIN
 ```
 
@@ -61,3 +63,57 @@ swaks --from asd@xyz.co --to x@asdffdsa.com --server localhost:587 -tls -a LOGIN
 Remember that haraka proxy is configured to allow relays from given whitelisted IP or after successful auth.
 
 See the mailhog web ui (http://localhost:8025) to see received emails.
+
+## Helm installation
+
+A Helm chart for harakahog is available in the GHCR (GitHub Container Registry).
+
+### Prerequisites
+
+- Kubernetes cluster
+- Helm 4.x
+
+### Install
+
+#### 1. Create secret with your TLS key and cert.
+
+```sh
+kubectl create secret generic harakahog-haraka-tls \
+  --from-file=tls_key.pem=tls_key.pem \
+  --from-file=tls_cert.pem=tls_cert.pem
+```
+
+#### 2. Login to GHCR (one time)
+
+```sh
+helm registry login ghcr.io
+```
+
+#### 3. Install the chart
+
+Check for the latest chart version in [GHCR](https://github.com/orgs/kopernic-pl/packages/container/package/charts%2Fharakahog).
+
+```sh
+helm install harakahog oci://ghcr.io/kopernic-pl/charts/harakahog \
+  --version <latest-version>
+```
+
+### Access services
+
+By default, services are accessible within the cluster. Mailhog web UI at http://localhost:8025,
+Haraka SMTP at http://localhost:5870.
+Default SMTP credentials are `admin`/`admin123`.
+Default whitelisted IPs for relay are: [`127.0.0.1/32`, `192.168.65.1/32`].
+
+### Test 
+
+You can verify if chart works by sending a dummy email using `swaks`:
+
+```sh
+swaks --from sender@example.org --to reciever@example.org --server localhost:5870 -tls -a LOGIN
+```
+
+### Customization
+
+To tune chart, you can override default values from [values.yaml](https://github.com/kopernic-pl/harakahog/blob/main/charts/harakahog/values.yaml).
+For more information check values documentation in [README.md](https://github.com/kopernic-pl/harakahog/blob/main/charts/harakahog/README.md).

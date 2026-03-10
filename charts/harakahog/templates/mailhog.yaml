@@ -21,10 +21,10 @@ spec:
           imagePullPolicy: {{ .Values.mailhog.image.pullPolicy }}
           ports:
             - name: smtp
-              containerPort: 1025
+              containerPort: {{ .Values.mailhog.service.smtpPort }}
               protocol: TCP
             - name: http
-              containerPort: 8025
+              containerPort: {{ .Values.mailhog.service.httpPort }}
               protocol: TCP
 ---
 apiVersion: v1
@@ -35,7 +35,7 @@ metadata:
     {{- include "harakahog.labels" . | nindent 4 }}
     {{- include "harakahog.mailhog.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.mailhog.service.type }}
+  type: ClusterIP
   ports:
     - port: {{ .Values.mailhog.service.smtpPort }}
       targetPort: smtp
@@ -47,4 +47,3 @@ spec:
       name: http
   selector:
     {{- include "harakahog.mailhog.labels" . | nindent 4 }}
-

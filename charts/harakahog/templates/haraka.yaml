@@ -7,7 +7,7 @@ metadata:
     {{- include "harakahog.haraka.labels" . | nindent 4 }}
 data:
   smtp.ini: |
-    listen=[::0]:587
+    listen=[::0]:{{ .Values.haraka.service.port }}
     [headers]
     max_lines=1000
     max_received=100
@@ -32,8 +32,8 @@ data:
   relay_acl_allow: |
     {{- include "harakahog.haraka.relayAclAllow" . | nindent 4 }}
   tls.ini: |
-    key=tls/tls_key.pem
-    cert=tls/tls_cert.pem
+    key=tls_key.pem
+    cert=tls_cert.pem
     minVersion=TLSv1.2
   auth_flat_file.ini: |
     [core]
@@ -66,8 +66,7 @@ spec:
             - -c
             - |
               cp /configmap/* /config/
-              mkdir -p /config/tls
-              cp /tls-secret/* /config/tls/
+              cp /tls-secret/* /config/
           volumeMounts:
             - name: haraka-configmap
               mountPath: /configmap
@@ -83,7 +82,7 @@ spec:
           imagePullPolicy: {{ .Values.haraka.image.pullPolicy }}
           ports:
             - name: smtp
-              containerPort: 587
+              containerPort: {{ .Values.haraka.service.port }}
               protocol: TCP
           env:
             - name: HARAKA_LOG_LEVEL
@@ -111,7 +110,7 @@ metadata:
     {{- include "harakahog.labels" . | nindent 4 }}
     {{- include "harakahog.haraka.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.haraka.service.type }}
+  type: ClusterIP
   ports:
     - port: {{ .Values.haraka.service.port }}
       targetPort: smtp
@@ -119,5 +118,3 @@ spec:
       name: smtp
   selector:
     {{- include "harakahog.haraka.labels" . | nindent 4 }}
-
-

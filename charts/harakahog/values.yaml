@@ -11,8 +11,6 @@ haraka:
     # -- Haraka image pull policy
     pullPolicy: IfNotPresent
   service:
-    # -- Haraka Kubernetes service type
-    type: ClusterIP
     # -- Haraka SMTP service port
     port: 5870
   config:
@@ -42,8 +40,6 @@ mailhog:
     # -- MailHog image pull policy
     pullPolicy: IfNotPresent
   service:
-    # -- MailHog Kubernetes service type
-    type: ClusterIP
     # -- MailHog SMTP port
     smtpPort: 1025
     # -- MailHog web UI port

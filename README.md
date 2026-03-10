@@ -77,6 +77,14 @@ A Helm chart for harakahog is available in the GHCR (GitHub Container Registry).
 
 #### 1. Create secret with your TLS key and cert.
 
+If you don't have TLS key and cert, you can generate self-signed for testing purposes:
+
+```sh
+openssl req -newkey rsa:2048 -nodes -keyform PEM -keyout tls_key.pem -outform PEM -x509 -days 365 -out tls_cert.pem
+```
+
+Then create a secret:
+
 ```sh
 kubectl create secret generic harakahog-haraka-tls \
   --from-file=tls_key.pem=tls_key.pem \
@@ -98,20 +106,22 @@ helm install harakahog oci://ghcr.io/kopernic-pl/charts/harakahog \
   --version <latest-version>
 ```
 
-### Access services
+### Access services and test
 
-By default, services are accessible within the cluster. Mailhog web UI at http://localhost:8025,
-Haraka SMTP at http://localhost:5870.
-Default SMTP credentials are `admin@example.org`/`admin123`.
-Default whitelisted IPs for relay are: [`127.0.0.1/32`, `192.168.65.1/32`].
+By default, services are accessible within the cluster. You can port-forward to your local machine using:
 
-### Test 
+```sh
+kubectl port-forward svc/harakahog-haraka 5870:5870
+kubectl port-forward svc/harakahog-mailhog 8025:8025
+```
 
 You can verify if chart works by sending a dummy email using `swaks`:
 
 ```sh
 swaks --from admin@example.org --to test@abc.com --server localhost:5870 -tls -a LOGIN
 ```
+
+Default SMTP credentials are `admin@example.org`/`admin123`.
 
 ### Customization
 

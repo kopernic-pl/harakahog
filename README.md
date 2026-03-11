@@ -99,7 +99,7 @@ helm registry login ghcr.io
 
 #### 3. Install the chart
 
-Check for the latest chart version in [GHCR](https://github.com/orgs/kopernic-pl/packages/container/package/charts%2Fharakahog).
+Check for the latest chart version in [GHCR](https://github.com/users/kopernic-pl/packages/container/harakahog).
 
 ```sh
 helm install harakahog oci://ghcr.io/kopernic-pl/charts/harakahog \
@@ -129,3 +129,8 @@ Default SMTP credentials are `admin@example.org`/`admin123`.
 
 To tune chart, you can override default values from [values.yaml](https://github.com/kopernic-pl/harakahog/blob/main/charts/harakahog/values.yaml).
 For more information check values documentation in [README.md](https://github.com/kopernic-pl/harakahog/blob/main/charts/harakahog/README.md).
+
+### Helm dev
+
+Before pushing any changes of the chart, make sure to run `helm unittest charts/harakahog -u` locally to verify 
+if all helm tests are passing and to update test snapshots.

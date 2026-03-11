@@ -11,23 +11,18 @@ permissions:
 
 jobs:
   helm-unittest:
-    name: Test helm chart
+    name: Test Helm chart
     runs-on: ubuntu-24.04
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          sparse-checkout: |
+            .github/actions
+            charts/harakahog
 
       - name: Install Helm
-        env:
-          VERSION: v4.1.1
-        run: |
-          curl -LO https://get.helm.sh/helm-${VERSION}-linux-amd64.tar.gz
-          tar -zxvf helm-${VERSION}-linux-amd64.tar.gz
-          sudo mv linux-amd64/helm /usr/local/bin/helm
+        uses: ./.github/actions/install/helm
 
       - name: Install helm-unittest plugin
         run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.0.3 --verify=false

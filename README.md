@@ -104,9 +104,10 @@ helm install harakahog oci://ghcr.io/kopernic-pl/charts/harakahog \
   --version <latest-version>
 ```
 
-### Access services and test
+### Verify and test
 
-By default, services are accessible within the cluster. You can port-forward to your local machine using:
+By default, services are accessible within the cluster. 
+You can port-forward to your local machine using:
 
 ```sh
 kubectl port-forward svc/harakahog-haraka 5870:5870

@@ -3,11 +3,11 @@ description: Installs Helm with specified version
 
 inputs:
   version:
-    description: 'Version of Helm to install'
-    default: '4.1.1'
+    description: "Version of Helm to install"
+    default: "4.1.1"
 
 runs:
-  using: 'composite'
+  using: composite
   steps:
     - name: Install Helm
       shell: bash

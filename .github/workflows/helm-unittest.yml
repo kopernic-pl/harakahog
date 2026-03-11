@@ -40,4 +40,4 @@ jobs:
         uses: mikepenz/action-junit-report@v6
         if: always()
         with:
-          report_paths: 'helm-test-results.xml'
+          report_paths: "helm-test-results.xml"

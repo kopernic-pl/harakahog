@@ -12,8 +12,6 @@ Specifically, we will configure Haraka to:
 - use SMTP LOGIN auth solely over TLS
 - forward all received emails to the companion MailHog container.
 
-## Prerequisites
-
 ## Docker installation
 
 ### To configure
@@ -130,7 +128,11 @@ Default SMTP credentials are `admin@example.org`/`admin123`.
 To tune chart, you can override default values from [values.yaml](https://github.com/kopernic-pl/harakahog/blob/main/charts/harakahog/values.yaml).
 For more information check values documentation in [README.md](https://github.com/kopernic-pl/harakahog/blob/main/charts/harakahog/README.md).
 
-### Helm dev
+### Developement
 
-Before pushing any changes of the chart, make sure to run `helm unittest charts/harakahog -u` locally to verify 
-if all helm tests are passing and to update test snapshots.
+Chart can be tested locally using `helm unittest` plugin.
+Before pushing any changes of the chart, make sure to run `helm unittest charts/harakahog -u` 
+locally to verify if all helm tests are passing and snapshots are up-to-date. 
+
+Chart uses helm-docs to document values. 
+Before pushing any changes to the chart, make sure to run `helm-docs -c charts/harakahog` to keep documentation up-to-date.

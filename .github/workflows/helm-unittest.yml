@@ -1,0 +1,48 @@
+name: Helm Unit Tests
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  helm-unittest:
+    name: Test helm chart
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Helm
+        env:
+          VERSION: v4.1.1
+        run: |
+          curl -LO https://get.helm.sh/helm-${VERSION}-linux-amd64.tar.gz
+          tar -zxvf helm-${VERSION}-linux-amd64.tar.gz
+          sudo mv linux-amd64/helm /usr/local/bin/helm
+
+      - name: Install helm-unittest plugin
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v1.0.3 --verify=false
+
+      - name: Run helm unit tests
+        id: helm-tests
+        run: |
+          helm unittest charts/harakahog \
+                --strict \
+                --output-type JUnit \
+                --output-file helm-test-results.xml
+        continue-on-error: true
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v6
+        if: always()
+        with:
+          report_paths: 'helm-test-results.xml'

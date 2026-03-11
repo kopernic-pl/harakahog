@@ -53,7 +53,8 @@ Relay destination route for the "any" domain.
 {{- define "harakahog.haraka.relayAnyRoute" -}}
 {{- $smtpName := include "harakahog.mailhog.fullname" . -}}
 {{- $smtpPort := .Values.mailhog.service.smtpPort -}}
-{{- $route := dict "action" "continue" "nexthop" (printf "%s:%v" $smtpName $smtpPort) -}}
+{{- $smtpHost := printf "%s.%s.svc.cluster.local" $smtpName .Release.Namespace -}}
+{{- $route := dict "action" "continue" "nexthop" (printf "%s:%v" $smtpHost $smtpPort) -}}
 {{- $route | toJson -}}
 {{- end }}
 

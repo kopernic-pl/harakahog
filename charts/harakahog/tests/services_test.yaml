@@ -1,0 +1,108 @@
+suite: services
+
+tests:
+  - it: should render Haraka service with correct port
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 2
+    release:
+      name: harakahog
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: harakahog-haraka
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports[0]
+          value:
+            port: 5870
+            targetPort: smtp
+            protocol: TCP
+            name: smtp
+
+  - it: should render Haraka service with custom port
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 2
+    release:
+      name: harakahog
+    set:
+      haraka:
+        service:
+          port: 2525
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 2525
+
+  - it: should render MailHog service with correct ports
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: harakahog-mailhog
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports[0]
+          value:
+            port: 1025
+            targetPort: smtp
+            protocol: TCP
+            name: smtp
+      - equal:
+          path: spec.ports[1]
+          value:
+            port: 8025
+            targetPort: http
+            protocol: TCP
+            name: http
+
+  - it: should render MailHog service with custom ports
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    set:
+      mailhog:
+        service:
+          smtpPort: 2025
+          httpPort: 9025
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 2025
+      - equal:
+          path: spec.ports[1].port
+          value: 9025
+
+  - it: should render Haraka Service matching snapshot
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 2
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot: {}
+
+  - it: should render MailHog Service matching snapshot
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot: {}
+

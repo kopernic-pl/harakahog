@@ -1,0 +1,109 @@
+suite: configmap
+
+tests:
+  - it: should route to MailHog FQDN in default namespace
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot:
+          path: data
+
+  - it: should route to MailHog FQDN in non-default namespace
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+      namespace: non-default
+    asserts:
+      - matchSnapshot:
+          path: data
+
+  - it: should use custom MailHog SMTP port in relay route
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    set:
+      mailhog:
+        service:
+          smtpPort: 2025
+    asserts:
+      - matchSnapshot:
+          path: data
+
+  - it: should listen on custom Haraka port
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    set:
+      haraka:
+        service:
+          port: 2525
+    asserts:
+      - matchSnapshot:
+          path: data
+
+  - it: should set custom log level
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    set:
+      haraka:
+        config:
+          logLevel: debug
+    asserts:
+      - matchSnapshot:
+          path: data
+
+  - it: should render custom auth users
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    set:
+      haraka:
+        config:
+          auth:
+            users:
+              user1@test.com: secret1
+              user2@test.com: secret2
+    asserts:
+      - matchSnapshot:
+          path: data
+
+  - it: should render custom relay ACL entries
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    set:
+      haraka:
+        config:
+          auth:
+            relayAcl:
+              - "10.0.0.0/8"
+              - "172.16.0.0/12"
+    asserts:
+      - matchSnapshot:
+          path: data
+
+  - it: should render full ConfigMap matching snapshot with defaults
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot: {}
+

@@ -1,0 +1,45 @@
+suite: wholechart
+templates:
+  - templates/haraka.yaml
+  - templates/mailhog.yaml
+
+tests:
+  - it: should render all resources with default values
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot: {}
+
+  - it: should render ConfigMap, Deployment, and Service for Haraka
+    templates:
+      - templates/haraka.yaml
+    release:
+      name: harakahog
+    asserts:
+      - hasDocuments:
+          count: 3
+      - isKind:
+          of: ConfigMap
+        documentIndex: 0
+      - isKind:
+          of: Deployment
+        documentIndex: 1
+      - isKind:
+          of: Service
+        documentIndex: 2
+
+  - it: should render Deployment and Service for MailHog
+    templates:
+      - templates/mailhog.yaml
+    release:
+      name: harakahog
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Deployment
+        documentIndex: 0
+      - isKind:
+          of: Service
+        documentIndex: 1
+

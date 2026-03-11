@@ -1,0 +1,315 @@
+should listen on custom Haraka port:
+  1: |
+    auth_flat_file.ini: |
+      [core]
+      methods=LOGIN
+      [users]
+
+      admin@example.org=admin123
+    log.ini: |
+      [main]
+      level=info
+      timestamps=false
+      format=default
+    plugins: |
+      relay
+      tls
+      auth/flat_file
+      queue/smtp_forward
+    relay.ini: |
+      [relay]
+      acl=true
+      force_routing=true
+      dest_domains=true
+    relay_acl_allow: |
+      127.0.0.1/32
+      192.168.65.1/32
+    relay_dest_domains.ini: |
+      [domains]
+      any = {"action":"continue","nexthop":"harakahog-mailhog.NAMESPACE.svc.cluster.local:1025"}
+    smtp.ini: |
+      listen=[::0]:2525
+      [headers]
+      max_lines=1000
+      max_received=100
+    tls.ini: |
+      key=tls_key.pem
+      cert=tls_cert.pem
+      minVersion=TLSv1.2
+should render custom auth users:
+  1: |
+    auth_flat_file.ini: |
+      [core]
+      methods=LOGIN
+      [users]
+
+      admin@example.org=admin123
+      user1@test.com=secret1
+      user2@test.com=secret2
+    log.ini: |
+      [main]
+      level=info
+      timestamps=false
+      format=default
+    plugins: |
+      relay
+      tls
+      auth/flat_file
+      queue/smtp_forward
+    relay.ini: |
+      [relay]
+      acl=true
+      force_routing=true
+      dest_domains=true
+    relay_acl_allow: |
+      127.0.0.1/32
+      192.168.65.1/32
+    relay_dest_domains.ini: |
+      [domains]
+      any = {"action":"continue","nexthop":"harakahog-mailhog.NAMESPACE.svc.cluster.local:1025"}
+    smtp.ini: |
+      listen=[::0]:5870
+      [headers]
+      max_lines=1000
+      max_received=100
+    tls.ini: |
+      key=tls_key.pem
+      cert=tls_cert.pem
+      minVersion=TLSv1.2
+should render custom relay ACL entries:
+  1: |
+    auth_flat_file.ini: |
+      [core]
+      methods=LOGIN
+      [users]
+
+      admin@example.org=admin123
+    log.ini: |
+      [main]
+      level=info
+      timestamps=false
+      format=default
+    plugins: |
+      relay
+      tls
+      auth/flat_file
+      queue/smtp_forward
+    relay.ini: |
+      [relay]
+      acl=true
+      force_routing=true
+      dest_domains=true
+    relay_acl_allow: |
+      10.0.0.0/8
+      172.16.0.0/12
+    relay_dest_domains.ini: |
+      [domains]
+      any = {"action":"continue","nexthop":"harakahog-mailhog.NAMESPACE.svc.cluster.local:1025"}
+    smtp.ini: |
+      listen=[::0]:5870
+      [headers]
+      max_lines=1000
+      max_received=100
+    tls.ini: |
+      key=tls_key.pem
+      cert=tls_cert.pem
+      minVersion=TLSv1.2
+should render full ConfigMap matching snapshot with defaults:
+  1: |
+    apiVersion: v1
+    data:
+      auth_flat_file.ini: |
+        [core]
+        methods=LOGIN
+        [users]
+
+        admin@example.org=admin123
+      log.ini: |
+        [main]
+        level=info
+        timestamps=false
+        format=default
+      plugins: |
+        relay
+        tls
+        auth/flat_file
+        queue/smtp_forward
+      relay.ini: |
+        [relay]
+        acl=true
+        force_routing=true
+        dest_domains=true
+      relay_acl_allow: |
+        127.0.0.1/32
+        192.168.65.1/32
+      relay_dest_domains.ini: |
+        [domains]
+        any = {"action":"continue","nexthop":"harakahog-mailhog.NAMESPACE.svc.cluster.local:1025"}
+      smtp.ini: |
+        listen=[::0]:5870
+        [headers]
+        max_lines=1000
+        max_received=100
+      tls.ini: |
+        key=tls_key.pem
+        cert=tls_cert.pem
+        minVersion=TLSv1.2
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/instance: harakahog
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: harakahog-haraka
+      name: harakahog-haraka-config
+should route to MailHog FQDN in default namespace:
+  1: |
+    auth_flat_file.ini: |
+      [core]
+      methods=LOGIN
+      [users]
+
+      admin@example.org=admin123
+    log.ini: |
+      [main]
+      level=info
+      timestamps=false
+      format=default
+    plugins: |
+      relay
+      tls
+      auth/flat_file
+      queue/smtp_forward
+    relay.ini: |
+      [relay]
+      acl=true
+      force_routing=true
+      dest_domains=true
+    relay_acl_allow: |
+      127.0.0.1/32
+      192.168.65.1/32
+    relay_dest_domains.ini: |
+      [domains]
+      any = {"action":"continue","nexthop":"harakahog-mailhog.NAMESPACE.svc.cluster.local:1025"}
+    smtp.ini: |
+      listen=[::0]:5870
+      [headers]
+      max_lines=1000
+      max_received=100
+    tls.ini: |
+      key=tls_key.pem
+      cert=tls_cert.pem
+      minVersion=TLSv1.2
+should route to MailHog FQDN in non-default namespace:
+  1: |
+    auth_flat_file.ini: |
+      [core]
+      methods=LOGIN
+      [users]
+
+      admin@example.org=admin123
+    log.ini: |
+      [main]
+      level=info
+      timestamps=false
+      format=default
+    plugins: |
+      relay
+      tls
+      auth/flat_file
+      queue/smtp_forward
+    relay.ini: |
+      [relay]
+      acl=true
+      force_routing=true
+      dest_domains=true
+    relay_acl_allow: |
+      127.0.0.1/32
+      192.168.65.1/32
+    relay_dest_domains.ini: |
+      [domains]
+      any = {"action":"continue","nexthop":"harakahog-mailhog.non-default.svc.cluster.local:1025"}
+    smtp.ini: |
+      listen=[::0]:5870
+      [headers]
+      max_lines=1000
+      max_received=100
+    tls.ini: |
+      key=tls_key.pem
+      cert=tls_cert.pem
+      minVersion=TLSv1.2
+should set custom log level:
+  1: |
+    auth_flat_file.ini: |
+      [core]
+      methods=LOGIN
+      [users]
+
+      admin@example.org=admin123
+    log.ini: |
+      [main]
+      level=debug
+      timestamps=false
+      format=default
+    plugins: |
+      relay
+      tls
+      auth/flat_file
+      queue/smtp_forward
+    relay.ini: |
+      [relay]
+      acl=true
+      force_routing=true
+      dest_domains=true
+    relay_acl_allow: |
+      127.0.0.1/32
+      192.168.65.1/32
+    relay_dest_domains.ini: |
+      [domains]
+      any = {"action":"continue","nexthop":"harakahog-mailhog.NAMESPACE.svc.cluster.local:1025"}
+    smtp.ini: |
+      listen=[::0]:5870
+      [headers]
+      max_lines=1000
+      max_received=100
+    tls.ini: |
+      key=tls_key.pem
+      cert=tls_cert.pem
+      minVersion=TLSv1.2
+should use custom MailHog SMTP port in relay route:
+  1: |
+    auth_flat_file.ini: |
+      [core]
+      methods=LOGIN
+      [users]
+
+      admin@example.org=admin123
+    log.ini: |
+      [main]
+      level=info
+      timestamps=false
+      format=default
+    plugins: |
+      relay
+      tls
+      auth/flat_file
+      queue/smtp_forward
+    relay.ini: |
+      [relay]
+      acl=true
+      force_routing=true
+      dest_domains=true
+    relay_acl_allow: |
+      127.0.0.1/32
+      192.168.65.1/32
+    relay_dest_domains.ini: |
+      [domains]
+      any = {"action":"continue","nexthop":"harakahog-mailhog.NAMESPACE.svc.cluster.local:2025"}
+    smtp.ini: |
+      listen=[::0]:5870
+      [headers]
+      max_lines=1000
+      max_received=100
+    tls.ini: |
+      key=tls_key.pem
+      cert=tls_cert.pem
+      minVersion=TLSv1.2

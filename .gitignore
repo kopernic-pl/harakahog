@@ -1,0 +1,46 @@
+# IDE and Editor Files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.iml
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Generated TLS/SSL Certificates and Keys
+**/tls_cert.pem
+**/tls_key.pem
+h-config/dhparams.pem
+h-config/me
+
+# Runtime and Log Files
+h-config/log.ini
+*.log
+logs/
+
+# Docker
+.docker/
+.dockerignore
+
+# Build Artifacts
+dist/
+build/
+*.o
+*.a
+*.so
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# Helm/Kubernetes temporary files
+**/Chart.lock
+**/values.yaml.bak

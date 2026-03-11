@@ -115,7 +115,9 @@ kubectl port-forward svc/harakahog-haraka 5870:5870
 kubectl port-forward svc/harakahog-mailhog 8025:8025
 ```
 
-You can verify if chart works by sending a dummy email using `swaks`:
+And access MailHog web UI at http://localhost:8025.
+
+You can verify mail forward by sending a dummy email to Haraka using `swaks`:
 
 ```sh
 swaks --from admin@example.org --to test@abc.com --server localhost:5870 -tls -a LOGIN

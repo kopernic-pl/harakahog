@@ -8,23 +8,21 @@ MailHog behind Haraka for TLS support
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| haraka | object | `{"config":{"auth":{"relayAcl":["127.0.0.1/32","192.168.65.1/32"],"users":{"admin":"admin123"}},"logLevel":"info","tls":{"secretName":""}},"image":{"pullPolicy":"IfNotPresent","repository":"instrumentisto/haraka","tag":"3.1.2"},"service":{"port":587,"type":"ClusterIP"}}` | Haraka configuration |
+| haraka | object | `{"config":{"auth":{"relayAcl":["127.0.0.1/32","192.168.65.1/32"],"users":{"admin@example.org":"admin123"}},"logLevel":"info","tls":{"secretName":""}},"image":{"pullPolicy":"IfNotPresent","repository":"instrumentisto/haraka","tag":"3.0.3"},"service":{"port":5870}}` | Haraka configuration |
 | haraka.config.auth.relayAcl | list | `["127.0.0.1/32","192.168.65.1/32"]` | List of IP addresses/ranges (CIDR) allowed to relay without authentication |
-| haraka.config.auth.users | object | `{"admin":"admin123"}` | Map of SMTP AUTH users (username: password) |
-| haraka.config.logLevel | string | `"info"` | Haraka log level<br> Must be one of: [data, protocol, debug, info, notice, warn, error, crit, alert, emerg] |
-| haraka.config.tls.secretName | string | `""` | Name of the Kubernetes secret containing `tls_key.pem` and `tls_cert.pem` (Defaults to `harakahog-tls` if left empty). |
+| haraka.config.auth.users | object | `{"admin@example.org":"admin123"}` | Map of SMTP AUTH users (email: password) |
+| haraka.config.logLevel | string | `"info"` | Haraka log level, must be one of: [data, protocol, debug, info, notice, warn, error, crit, alert, emerg] |
+| haraka.config.tls.secretName | string | `"harakahog-haraka-tls"` | Name of the Kubernetes secret containing `tls_key.pem` and `tls_cert.pem`. Empty fallbacks to default. |
 | haraka.image.pullPolicy | string | `"IfNotPresent"` | Haraka image pull policy |
 | haraka.image.repository | string | `"instrumentisto/haraka"` | Haraka Docker image repository |
-| haraka.image.tag | string | `"3.1.2"` | Haraka Docker image tag |
-| haraka.service.port | int | `587` | Haraka SMTP service port |
-| haraka.service.type | string | `"ClusterIP"` | Haraka Kubernetes service type |
-| mailhog | object | `{"image":{"pullPolicy":"IfNotPresent","repository":"mailhog/mailhog","tag":"v1.0.1"},"service":{"httpPort":8025,"smtpPort":1025,"type":"ClusterIP"}}` | MailHog configuration |
+| haraka.image.tag | string | `"3.0.3"` | Haraka Docker image tag |
+| haraka.service.port | int | `5870` | Haraka SMTP service port |
+| mailhog | object | `{"image":{"pullPolicy":"IfNotPresent","repository":"mailhog/mailhog","tag":"v1.0.1"},"service":{"httpPort":8025,"smtpPort":1025}}` | MailHog configuration |
 | mailhog.image.pullPolicy | string | `"IfNotPresent"` | MailHog image pull policy |
 | mailhog.image.repository | string | `"mailhog/mailhog"` | MailHog Docker image repository |
 | mailhog.image.tag | string | `"v1.0.1"` | MailHog Docker image tag |
 | mailhog.service.httpPort | int | `8025` | MailHog web UI port |
 | mailhog.service.smtpPort | int | `1025` | MailHog SMTP port |
-| mailhog.service.type | string | `"ClusterIP"` | MailHog Kubernetes service type |
 | replicaCount | int | `1` | Number of pod replicas for all deployments |
 
 ----------------------------------------------

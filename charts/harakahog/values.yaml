@@ -14,12 +14,12 @@ haraka:
     # -- Haraka SMTP service port
     port: 5870
   config:
-    # -- Haraka log level<br>
-    # Must be one of: [data, protocol, debug, info, notice, warn, error, crit, alert, emerg]
+    # -- Haraka log level, must be one of:
+    # [data, protocol, debug, info, notice, warn, error, crit, alert, emerg]
     logLevel: info
     tls:
-      # -- Name of the Kubernetes secret containing `tls_key.pem` and `tls_cert.pem`
-      # (Defaults to `harakahog-tls` if left empty).
+      # -- Name of the Kubernetes secret containing `tls_key.pem` and `tls_cert.pem`. Empty fallbacks to default.
+      # @default -- `"harakahog-haraka-tls"`
       secretName: ""
     auth:
       # -- Map of SMTP AUTH users (email: password)

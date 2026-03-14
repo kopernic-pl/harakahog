@@ -1,0 +1,303 @@
+suite: deployments
+tests:
+  - it: should render ConfigMap, Deployment, and Service for Haraka
+    templates:
+      - templates/haraka.yaml
+    release:
+      name: harakahog
+    asserts:
+      - hasDocuments:
+          count: 3
+      - isKind:
+          of: ConfigMap
+        documentIndex: 0
+      - isKind:
+          of: Deployment
+        documentIndex: 1
+      - isKind:
+          of: Service
+        documentIndex: 2
+
+  - it: should render Deployment and Service for MailHog
+    templates:
+      - templates/mailhog.yaml
+    release:
+      name: harakahog
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Deployment
+        documentIndex: 0
+      - isKind:
+          of: Service
+        documentIndex: 1
+
+  - it: should use the configured Haraka image
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "instrumentisto/haraka:3.0.3"
+
+  - it: should use custom Haraka image when overridden
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    set:
+      haraka:
+        image:
+          repository: custom/haraka
+          tag: "4.0.0"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "custom/haraka:4.0.0"
+
+  - it: should use the configured MailHog image
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "mailhog/mailhog:v1.0.1"
+
+  - it: should use custom MailHog image when overridden
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    set:
+      mailhog:
+        image:
+          repository: custom/mailhog
+          tag: "v2.0.0"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "custom/mailhog:v2.0.0"
+
+  - it: should set replica count on Haraka deployment
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    set:
+      replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: should set replica count on MailHog deployment
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    set:
+      replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: should set Haraka container port from values
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0]
+          value:
+            name: smtp
+            containerPort: 5870
+            protocol: TCP
+
+  - it: should set custom Haraka container port
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    set:
+      haraka:
+        service:
+          port: 2525
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 2525
+
+  - it: should set MailHog container ports from values
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0]
+          value:
+            name: smtp
+            containerPort: 1025
+            protocol: TCP
+      - equal:
+          path: spec.template.spec.containers[0].ports[1]
+          value:
+            name: http
+            containerPort: 8025
+            protocol: TCP
+
+  - it: should set HARAKA_LOG_LEVEL env var
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: HARAKA_LOG_LEVEL
+            value: "info"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: APK_INSTALL_PACKAGES
+            value: "openssl"
+
+  - it: should reflect custom log level in env
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    set:
+      haraka:
+        config:
+          logLevel: debug
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: HARAKA_LOG_LEVEL
+            value: "debug"
+
+  - it: should have init-config container copying config and tls secret
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: init-config
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: "busybox:1.36"
+      - contains:
+          path: spec.template.spec.initContainers[0].volumeMounts
+          content:
+            name: h-config
+            mountPath: /h-config
+            readOnly: true
+      - contains:
+          path: spec.template.spec.initContainers[0].volumeMounts
+          content:
+            name: tls-secret
+            mountPath: /tls-secret
+            readOnly: true
+      - contains:
+          path: spec.template.spec.initContainers[0].volumeMounts
+          content:
+            name: haraka-config
+            mountPath: /config
+
+  - it: should mount haraka config volume at /etc/haraka/config
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].mountPath
+          value: /etc/haraka/config
+
+  - it: should reference the ConfigMap and default TLS secret in volumes
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: h-config
+            configMap:
+              name: harakahog-haraka-config
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: tls-secret
+            secret:
+              secretName: harakahog-haraka-tls
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: haraka-config
+            emptyDir: {}
+
+  - it: should use custom TLS secret name when set
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    set:
+      haraka:
+        config:
+          tls:
+            secretName: my-custom-tls
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: tls-secret
+            secret:
+              secretName: my-custom-tls
+
+  - it: should render Haraka deployment matching snapshot
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot: {}
+
+  - it: should render MailHog deployment matching snapshot
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot: {}
+

@@ -1,0 +1,42 @@
+should render Haraka Service matching snapshot:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: harakahog
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: harakahog-haraka
+      name: harakahog-haraka
+    spec:
+      ports:
+        - name: smtp
+          port: 5870
+          protocol: TCP
+          targetPort: smtp
+      selector:
+        app.kubernetes.io/name: harakahog-haraka
+      type: ClusterIP
+should render MailHog Service matching snapshot:
+  1: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/instance: harakahog
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: harakahog-mailhog
+      name: harakahog-mailhog
+    spec:
+      ports:
+        - name: smtp
+          port: 1025
+          protocol: TCP
+          targetPort: smtp
+        - name: http
+          port: 8025
+          protocol: TCP
+          targetPort: http
+      selector:
+        app.kubernetes.io/name: harakahog-mailhog
+      type: ClusterIP

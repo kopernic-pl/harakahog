@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-config" (include "harakahog.haraka.fullname" .) }}
+  labels:
+    {{- include "harakahog.labels" . | nindent 4 }}
+    {{- include "harakahog.haraka.labels" . | nindent 4 }}
+data:
+  smtp.ini: |
+    listen=[::0]:{{ .Values.haraka.service.port }}
+    [headers]
+    max_lines=1000
+    max_received=100
+  log.ini: |
+    [main]
+    level={{ .Values.haraka.config.logLevel }}
+    timestamps=false
+    format=default
+  plugins: |
+    relay
+    tls
+    auth/flat_file
+    queue/smtp_forward
+  relay.ini: |
+    [relay]
+    acl=true
+    force_routing=true
+    dest_domains=true
+  relay_dest_domains.ini: |
+    [domains]
+    any = {{ include "harakahog.haraka.relayAnyRoute" . }}
+  relay_acl_allow: |
+    {{- include "harakahog.haraka.relayAclAllow" . | nindent 4 }}
+  tls.ini: |
+    key=tls_key.pem
+    cert=tls_cert.pem
+    minVersion=TLSv1.2
+  auth_flat_file.ini: |
+    [core]
+    methods=LOGIN
+    [users]
+    {{- include "harakahog.haraka.authUsers" . | nindent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "harakahog.haraka.fullname" . }}
+  labels:
+    {{- include "harakahog.labels" . | nindent 4 }}
+    {{- include "harakahog.haraka.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "harakahog.haraka.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "harakahog.haraka.labels" . | nindent 8 }}
+    spec:
+      initContainers:
+        - name: init-config
+          image: "busybox:1.36"
+          command:
+            - sh
+            - -c
+            - |
+              cp /h-config/* /config/
+              cp /tls-secret/* /config/
+          volumeMounts:
+            - name: h-config
+              mountPath: /h-config
+              readOnly: true
+            - name: tls-secret
+              mountPath: /tls-secret
+              readOnly: true
+            - name: haraka-config
+              mountPath: /config
+      containers:
+        - name: haraka
+          image: "{{ .Values.haraka.image.repository }}:{{ .Values.haraka.image.tag }}"
+          imagePullPolicy: {{ .Values.haraka.image.pullPolicy }}
+          ports:
+            - name: smtp
+              containerPort: {{ .Values.haraka.service.port }}
+              protocol: TCP
+          env:
+            - name: HARAKA_LOG_LEVEL
+              value: {{ .Values.haraka.config.logLevel | quote }}
+            - name: APK_INSTALL_PACKAGES
+              value: "openssl"
+          volumeMounts:
+            - name: haraka-config
+              mountPath: /etc/haraka/config
+      volumes:
+        - name: h-config
+          configMap:
+            name: {{ printf "%s-config" (include "harakahog.haraka.fullname" .) }}
+        - name: tls-secret
+          secret:
+            secretName: {{ default (printf "%s-tls" (include "harakahog.haraka.fullname" .)) .Values.haraka.config.tls.secretName }}
+        - name: haraka-config
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "harakahog.haraka.fullname" . }}
+  labels:
+    {{- include "harakahog.labels" . | nindent 4 }}
+    {{- include "harakahog.haraka.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.haraka.service.port }}
+      targetPort: smtp
+      protocol: TCP
+      name: smtp
+  selector:
+    {{- include "harakahog.haraka.labels" . | nindent 4 }}

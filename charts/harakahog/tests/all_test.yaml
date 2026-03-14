@@ -1,0 +1,11 @@
+suite: wholechart
+templates:
+  - templates/haraka.yaml
+  - templates/mailhog.yaml
+
+tests:
+  - it: should render all resources with default values
+    release:
+      name: harakahog
+    asserts:
+      - matchSnapshot: {}

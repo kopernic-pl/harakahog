@@ -1,0 +1,199 @@
+suite: labels
+
+tests:
+  - it: should set correct labels on Haraka ConfigMap
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: harakahog
+            app.kubernetes.io/name: harakahog-haraka
+
+  - it: should set correct labels on Haraka Deployment
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: harakahog
+            app.kubernetes.io/name: harakahog-haraka
+
+  - it: should set correct pod labels on Haraka Deployment
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: harakahog-haraka
+
+  - it: should set correct selector on Haraka Deployment
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: harakahog-haraka
+
+  - it: should set correct labels on Haraka Service
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 2
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: harakahog
+            app.kubernetes.io/name: harakahog-haraka
+
+  - it: should set correct selector on Haraka Service
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 2
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: harakahog-haraka
+
+  - it: should set correct labels on MailHog Deployment
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: harakahog
+            app.kubernetes.io/name: harakahog-mailhog
+
+  - it: should set correct pod labels on MailHog Deployment
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.template.metadata.labels
+          value:
+            app.kubernetes.io/name: harakahog-mailhog
+
+  - it: should set correct selector on MailHog Deployment
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: harakahog-mailhog
+
+  - it: should set correct labels on MailHog Service
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: harakahog
+            app.kubernetes.io/name: harakahog-mailhog
+
+  - it: should set correct selector on MailHog Service
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 1
+    release:
+      name: harakahog
+    asserts:
+      - equal:
+          path: spec.selector
+          value:
+            app.kubernetes.io/name: harakahog-mailhog
+
+  - it: should reflect custom release name in Haraka ConfigMap labels
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 0
+    release:
+      name: my-release
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: my-release
+            app.kubernetes.io/name: my-release-haraka
+
+  - it: should reflect custom release name in Haraka Deployment labels
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: my-release
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: my-release
+            app.kubernetes.io/name: my-release-haraka
+
+  - it: should reflect custom release name in MailHog Deployment labels
+    templates:
+      - templates/mailhog.yaml
+    documentIndex: 0
+    release:
+      name: my-release
+    asserts:
+      - equal:
+          path: metadata.labels
+          value:
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/instance: my-release
+            app.kubernetes.io/name: my-release-mailhog
+
+  - it: should reflect custom release name in resource names
+    templates:
+      - templates/haraka.yaml
+    documentIndex: 1
+    release:
+      name: my-release
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-release-haraka
+
+
